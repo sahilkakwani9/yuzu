@@ -11,6 +11,10 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        yellow: "#F9E92B",
+      },
+      fontFamily: {
+        saira: ["var(--font-saira)"],
       },
     },
   },

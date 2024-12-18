@@ -12,7 +12,7 @@ function Navbar() {
         width={75}
       />
       <div className="flex flex-row gap-5">
-        <div className="bg-[#F9E92B] h-[30px] w-[30px] flex flex-row justify-center items-center rounded-md">
+        <div className="bg-yellow h-[30px] w-[30px] flex flex-row justify-center items-center rounded-md">
           <Image
             src={"/assets/tiktok.svg"}
             alt="yuzu-logo"
