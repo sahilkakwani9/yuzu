@@ -3,7 +3,7 @@ import React from "react";
 
 function Navbar() {
   return (
-    <div className="flex flex-row justify-between p-5">
+    <div className="flex flex-row justify-between p-5 z-100">
       <Image
         src={"/logo.webp"}
         alt="yuzu-logo"

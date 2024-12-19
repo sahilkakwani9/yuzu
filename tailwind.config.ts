@@ -16,6 +16,10 @@ export default {
       fontFamily: {
         saira: ["var(--font-saira)"],
       },
+      backgroundImage: {
+        landing: 'url("/landing.webp")',
+        gradientt: 'url("/gradient.webp")',
+      },
     },
   },
   plugins: [],
