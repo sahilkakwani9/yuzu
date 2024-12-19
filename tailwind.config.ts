@@ -19,6 +19,7 @@ export default {
       backgroundImage: {
         landing: 'url("/landing.webp")',
         gradientt: 'url("/gradient.webp")',
+        bgMobile: 'url("/bg-mobile.png")',
       },
     },
   },

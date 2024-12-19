@@ -11,7 +11,7 @@ export default function SearchInput({
   onChange,
 }: SearchInputProps) {
   return (
-    <div className="relative w-full max-w-sm mx-auto mt-24">
+    <div className="relative w-full max-w-[90%] md:max-w-sm mx-auto mt-24">
       <div className="relative">
         <input
           type="text"

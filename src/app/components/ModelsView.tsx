@@ -6,7 +6,7 @@ function ModelsView() {
   const assets = [
     {
       imageUrl: "/modals/genopots.webp",
-      name: "GENOPOTS",
+      name: "GENOPETS",
       description: "The world's first Move-to-Earn NFT Game.",
     },
     {

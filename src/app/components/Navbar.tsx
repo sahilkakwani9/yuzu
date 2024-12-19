@@ -3,11 +3,11 @@ import React from "react";
 
 function Navbar() {
   return (
-    <div className="flex flex-row justify-between p-5 z-100">
+    <div className="flex flex-row justify-center md:justify-between p-5 z-100">
       <Image
         src={"/logo.webp"}
         alt="yuzu-logo"
-        className="h-[78px] w-[75px]"
+        className="h-[78px] w-[75px] hidden md:block"
         height={78}
         width={75}
       />

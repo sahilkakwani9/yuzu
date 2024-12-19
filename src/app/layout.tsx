@@ -33,8 +33,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${saira.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${saira.variable} antialiased relative`}
       >
+        <img
+          src="/bg-mobile.png"
+          className="absolute inset-0 w-screen h-full object-cover -z-10 md:hidden"
+        />
+        <img
+        src="/gradient.webp"
+        className="absolute left-0 -z-10 hidden md:block w-screen h-full object-fill"
+      />
         <Navbar />
         {children}
       </body>
