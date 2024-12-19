@@ -6,7 +6,7 @@ import ComingSoon from "./components/ComingSoon";
 export default function Home() {
   return (
     <div className="min-h-screen z-10 max-h-fit overflow-hidden">
-      <img src="/gradient.png" className="absolute -top-24 left-0 -z-10" />
+      <img src="/gradient.webp" className="absolute -top-24 left-0 -z-10" />
       <div>
         <Image
           src={"/assets/hallmark.svg"}
