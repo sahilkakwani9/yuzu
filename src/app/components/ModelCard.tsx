@@ -18,7 +18,7 @@ const GamingCard = ({
           <img
             src={imageUrl || "/api/placeholder/192/256"}
             alt="Gaming character"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-fill"
           />
         </div>
 

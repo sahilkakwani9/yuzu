@@ -5,6 +5,12 @@ import GamingCard from "./ModelCard";
 function ModelsView() {
   const assets = [
     {
+      imageUrl: "/modals/streetfighter.webp",
+      name: "STREET FIGHTER",
+      description:
+        "A legendary fighting game series where world warriors compete in hand-to-hand combat using unique martial arts.",
+    },
+    {
       imageUrl: "/modals/genopots.webp",
       name: "GENOPETS",
       description: "The world's first Move-to-Earn NFT Game.",
