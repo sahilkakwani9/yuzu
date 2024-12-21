@@ -9,7 +9,7 @@ function ModelsView() {
   return (
     <div>
       <SearchInput />
-      <div className="flex flex-row flex-wrap max-w-5xl mx-auto gap-8 mt-12">
+      <div className="flex flex-row flex-wrap max-w-5xl mx-auto gap-8 mt-12 items-center justify-center md:justify-start">
         {games.map((game) => (
           <Link key={game.id} href={`/modals/${game.id}`}>
             <GamingCard

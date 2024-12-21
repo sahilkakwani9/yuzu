@@ -33,7 +33,7 @@ export default function ProfileCard() {
               className="rounded-sm object-cover w-36 h-44"
             />
             <div className="space-y-4 flex-1">
-              <div className="flex items-center gap-3">
+              <div className="md:flex items-center gap-3">
                 <div className="relative">
                   <div className="absolute inset-0 bg-black rounded-xl translate-y-1.5 translate-x-1.5" />
                   <div className="relative bg-[#F9E92B] text-black px-4 md:pl-4 pr-10 py-1.5 md:py-1 rounded-xl border-[3px] border-black">
@@ -44,19 +44,23 @@ export default function ProfileCard() {
                 </div>
                 <Badge
                   variant="outline"
-                  className="bg-yellow text-yellow bg-opacity-50 border-yellow px-4 py-2 rounded-full"
+                  className="bg-yellow text-yellow bg-opacity-50 border-yellow px-4 py-2 rounded-full mt-8 md:mt-0"
                 >
                   {game.category}
                 </Badge>
               </div>
               <div className="font-saira text-lg text-white">{game.ticker}</div>
-              <p className="font-saira text-sm leading-relaxed text-yellow">
+              <p className="font-saira text-sm leading-relaxed text-yellow hidden md:block">
                 {game.description}
               </p>
             </div>
+            
           </div>
+          <p className="font-saira text-sm leading-relaxed text-yellow md:hidden">
+                {game.description}
+              </p>
 
-          <div className="flex justify-between gap-4">
+          <div className="md:flex justify-between gap-4">
             <Button
               variant="outline"
               className="font-saira text-yellow bg-yellow bg-opacity-50 border-yellow hover:bg-yellow hover:text-yellow"
@@ -67,7 +71,7 @@ export default function ProfileCard() {
             </Button>
             <Button
               variant="outline"
-              className="font-saira text-yellow bg-yellow bg-opacity-50 border-yellow hover:bg-yellow hover:text-yellow"
+              className="font-saira mt-4 md:mt-0 text-yellow bg-yellow bg-opacity-50 border-yellow hover:bg-yellow hover:text-yellow"
               onClick={() =>
                 navigator.clipboard.writeText(game.contractAddress)
               }
@@ -80,7 +84,7 @@ export default function ProfileCard() {
 
         <CardContent>
           <Tabs defaultValue="model" className="w-full">
-            <TabsList className="w-full justify-start bg-transparent border-b border-yellow rounded-none">
+            <TabsList className="w-full overflow-scroll justify-start bg-transparent border-b border-yellow rounded-none">
               {[
                 "Model Card",
                 "Code (0)",
@@ -98,17 +102,17 @@ export default function ProfileCard() {
             </TabsList>
             <TabsContent value="model" className="mt-6">
               <h2 className="text-xl font-saira text-yellow">{game.name}</h2>
-              <div className="flex flex-row justify-between items-center gap-8">
+              <div className="md:flex flex-row justify-between items-center gap-8">
                 <p className="font-saira text-sm leading-relaxed text-white flex-[2.5]">
                   {game.longDescription}
                 </p>
 
                 <div className="items-start flex-[1.2]">
                   <div className="text-right">
-                    <div className="font-saira text-sm text-yellow">
+                    <div className="flex items-center md:block font-saira text-sm text-yellow">
                       Total Downloads
                     </div>
-                    <div className="flex flex-row justify-center gap-4 items-end">
+                    <div className="md:flex flex-row justify-center gap-4 items-end">
                       <div className="font-saira text-4xl text-yellow">
                         {game.downloads.total}
                       </div>
