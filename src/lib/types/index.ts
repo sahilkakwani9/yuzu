@@ -1,6 +1,7 @@
 export type Game = {
   id: string;
   imageUrl: string;
+  demo: string;
   name: string;
   description: string;
   shortDescription: string;

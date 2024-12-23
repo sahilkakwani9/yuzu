@@ -7,6 +7,7 @@ export const SUBHEADLINE =
 export const games: Game[] = [
   {
     id: "street-fighter",
+    demo: "https://drive.google.com/drive/folders/1tPfhWxrliEqSkzGPKk_gv-ru3wpZLfmX",
     imageUrl: "/modals/streetfighter.webp",
     name: "STREET FIGHTER",
     ticker: "$SF6",
@@ -24,8 +25,7 @@ export const games: Game[] = [
       {
         id: "sf-1",
         title: "Hadoken Motion Detection",
-        content:
-          `import retro
+        content: `import retro
 from gym import Env
 from gym.spaces import MultiBinary, Box
 import numpy as np
@@ -145,6 +145,7 @@ if __name__ == '__main__':
   {
     id: "genopets",
     imageUrl: "/modals/genopots.webp",
+    demo: "https://drive.google.com/drive/folders/1XUfd1t3nHVM3VW8AvJ1kzP8J3x03NK8f",
     name: "GENOPETS",
     ticker: "$GENE",
     category: "Move-to-Earn",
@@ -286,6 +287,7 @@ if __name__ == '__main__':
   {
     id: "aurory",
     imageUrl: "/modals/aurory.webp",
+    demo: "",
     name: "AURORY",
     ticker: "$AURY",
     category: "RPG",
@@ -303,6 +305,7 @@ if __name__ == '__main__':
   },
   {
     id: "astrospace",
+    demo: "",
     imageUrl: "/modals/astrospace.webp",
     name: "ASTROSPACE",
     ticker: "$ASTRO",
@@ -322,6 +325,7 @@ if __name__ == '__main__':
   {
     id: "star-atlas",
     imageUrl: "/modals/staratlas.webp",
+    demo: "",
     name: "STARATLAS",
     ticker: "$ATLAS",
     category: "Metaverse",

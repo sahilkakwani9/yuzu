@@ -89,6 +89,14 @@ export default function ProfileCard() {
               CA: {game.contractAddress}
               <Copy className="ml-2 h-4 w-4" />
             </Button>
+            <a href={game.demo} target="_blank">
+              <Button
+                variant="outline"
+                className="font-saira mt-4 md:mt-0 text-yellow bg-yellow bg-opacity-50 border-yellow hover:bg-white hover:text-yellow"
+              >
+                Demo
+              </Button>
+            </a>
           </div>
         </CardHeader>
 
