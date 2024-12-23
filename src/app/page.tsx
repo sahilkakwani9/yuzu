@@ -5,7 +5,7 @@ import ComingSoon from "./components/ComingSoon";
 
 export default function Home() {
   return (
-    <div className="min-h-screen z-10 max-h-fit overflow-hidden">
+    <div className="min-h-screen z-10 max-h-fit overflow-hidden pb-20">
       <div>
         <Image
           src={"/assets/hallmark.svg"}
@@ -36,7 +36,7 @@ export default function Home() {
         </div>
         <ModelsView />
       </div>
-      <ComingSoon />
+      {/* <ComingSoon /> */}
     </div>
   );
 }
