@@ -13,4 +13,31 @@ export type Game = {
   };
   longDescription: string;
   geckoTerminalUrl: string;
+  codes: CodeItem[];
+  discussions: Discussion[];
+  competitions: Competition[];
 };
+
+export interface CodeItem {
+  id: string;
+  title: string;
+  content: string;
+  author: string;
+  date: string;
+}
+
+export interface Discussion {
+  id: string;
+  title: string;
+  content: string;
+  author: string;
+  date: string;
+}
+
+export interface Competition {
+  id: string;
+  title: string;
+  status: string;
+  prize: string;
+  endDate: string;
+}
