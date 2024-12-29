@@ -14,11 +14,11 @@ const GamingCard = ({
       {/* Main card container */}
       <div className="relative flex flex-col md:flex-row gap-3 md:gap-6 p-3 md:p-4 rounded-xl">
         {/* Image container */}
-        <div className="w-full md:w-36 h-40 md:h-48 overflow-hidden rounded-lg">
+        <div className="w-full md:w-36 h-64 md:h-48 overflow-hidden rounded-lg">
           <img
             src={imageUrl || "/api/placeholder/192/256"}
             alt="Gaming character"
-            className="w-full h-full object-fill"
+            className="w-full h-full object-cover"
           />
         </div>
 
