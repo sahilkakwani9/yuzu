@@ -12,7 +12,10 @@ function Navbar() {
         width={75}
       />
       <div className="flex flex-row gap-5">
-        <div className="bg-yellow h-[30px] w-[30px] flex flex-row justify-center items-center rounded-md">
+        <a
+          className="bg-yellow h-[30px] w-[30px] flex flex-row justify-center items-center rounded-md"
+          href="https://www.tiktok.com/@yuzudotgame?_t=ZN-8ssj4VFyA9G&_r=1"
+        >
           <Image
             src={"/assets/tiktok.svg"}
             alt="yuzu-logo"
@@ -20,8 +23,8 @@ function Navbar() {
             height={30}
             width={30}
           />
-        </div>
-        <a>
+        </a>
+        <a href="https://www.instagram.com/yuzudotgame/profilecard/?igsh=MW13ZWQyNWU4cWhuNQ==">
           <Image
             src={"/assets/instagram.svg"}
             alt="yuzu-logo"
@@ -30,7 +33,7 @@ function Navbar() {
             width={30}
           />
         </a>
-        <a>
+        <a href="https://x.com/yuzudotgame"> 
           <Image
             src={"/assets/X.svg"}
             alt="yuzu-logo"
