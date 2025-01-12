@@ -44,7 +44,13 @@ function Navbar() {
             width={30}
           />
         </a>
-        <WalletMultiButton style={{}} />
+        <WalletMultiButton
+          style={{
+            backgroundColor: "#F9E92B",
+            color: "black",
+            height: "30px",
+          }}
+        />
       </div>
     </div>
   );

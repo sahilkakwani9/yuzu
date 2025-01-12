@@ -373,122 +373,6 @@ function Page() {
               <div>0.4%</div>
             </div>
           </div>
-
-          <hr className="border-yellow border-opacity-50 my-4" />
-
-          {/* Pool Links */}
-          <div className="mt-6 font-saira">
-            <h3 className="text-yellow text-lg mb-3">Pool Chart</h3>
-            <div className="flex gap-2">
-              <a
-                className="text-yellow border border-yellow p-1 rounded block mb-2 w-32 text-center"
-                href="https://www.birdeye.so"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Birdeye
-              </a>
-              <a
-                className="text-yellow border border-yellow p-1 rounded block mb-2 w-32 text-center"
-                href="https://www.geckoterminal.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                GeckoTerminal
-              </a>
-              <a
-                className="text-yellow border border-yellow p-1 rounded block mb-2 w-32 text-center"
-                href="https://www.dexscreener.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                DEXScreener
-              </a>
-              <a
-                className="text-yellow border border-yellow p-1 rounded block mb-2 w-32 text-center"
-                href="https://www.dextools.io"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                DEXTools
-              </a>
-            </div>
-          </div>
-
-          <hr className="border-yellow border-opacity-50 my-4" />
-
-          {/* Trading Platforms */}
-          <div className="mt-6 font-saira">
-            <h3 className="text-yellow text-lg mb-3">
-              Supported Trading Platforms
-            </h3>
-            <div className="flex gap-2 flex-wrap max-w-full">
-              <a
-                className="text-yellow border border-yellow p-1 rounded block mb-1 w-auto text-center"
-                href="https://www.ape.pro"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Ape.Pro
-              </a>
-              <a
-                className="text-yellow border border-yellow p-1 rounded block mb-1 w-auto text-center"
-                href="https://www.bananagun.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Banana Gun
-              </a>
-              <a
-                className="text-yellow border border-yellow p-1 rounded block mb-1 w-auto text-center"
-                href="https://www.bonkbot.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                BONKbot
-              </a>
-              <a
-                className="text-yellow border border-yellow p-1 rounded block mb-1 w-auto text-center"
-                href="https://www.fluxbot.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Fluxbot
-              </a>
-              <a
-                className="text-yellow border border-yellow p-1 rounded block mb-1 w-auto text-center"
-                href="https://www.jupiter.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Jupiter
-              </a>
-              <a
-                className="text-yellow border border-yellow p-1 rounded block mb-1 w-auto text-center"
-                href="https://www.metasolanabot.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                MetaSolanaBot
-              </a>
-              <a
-                className="text-yellow border border-yellow p-1 rounded block mb-1 w-auto text-center"
-                href="https://www.photon.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Photon
-              </a>
-              <a
-                className="text-yellow border border-yellow p-1 rounded mb-1 w-auto text-center"
-                href="https://www.trojan.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Trojan
-              </a>
-            </div>
-          </div>
         </div>
 
         {/* Right Column */}
@@ -643,13 +527,13 @@ function Page() {
                       Withdraw Quote
                     </h3>
                     <p className="text-yellow text-sm">
-                      <span className="font-semibold">USDC Out:</span>{" "}
+                      <span className="font-semibold">USDC:</span>{" "}
                       {currentWithdrawQoute.tokenAOutAmount.toNumber() /
                         1000000}{" "}
                       USDC
                     </p>
                     <p className="text-yellow text-sm">
-                      <span className="font-semibold">SOL Out:</span>{" "}
+                      <span className="font-semibold">SOL:</span>{" "}
                       {currentWithdrawQoute.tokenBOutAmount.toNumber() /
                         LAMPORTS_PER_SOL}{" "}
                       SOL
