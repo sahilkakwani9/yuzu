@@ -1,37 +1,14 @@
 "use client";
 import React from "react";
-import AmmImpl, { MAINNET_POOL } from "@mercurial-finance/dynamic-amm-sdk";
 import { Connection, Keypair } from "@solana/web3.js";
-import { Node, AnchorProvider } from "@coral-xyz/anchor";
-import { YuzuWallet } from "@/lib/wallet";
+import useMeteora from "@/lib/hooks/meteora";
 
 function Page() {
   const mainnetConnection = new Connection(
     "https://api.mainnet-beta.solana.com"
   );
-  const mockWallet = new YuzuWallet(new Keypair());
-  const provider = new AnchorProvider(mainnetConnection, mockWallet, {
-    commitment: "confirmed",
-  });
 
-  const depositToPool = async () => {
-    try {
-      const constantProductPool = await AmmImpl.create(
-        mainnetConnection,
-        MAINNET_POOL.USDC_SOL
-      );
-      const stablePool = await AmmImpl.create(
-        mainnetConnection,
-        MAINNET_POOL.USDT_USDC
-      );
-      const lpSupply = await constantProductPool.getLpSupply();
-
-      console.log("lpSupply", lpSupply);
-    } catch (error) {
-      console.log("Error depositing to pool:", error);
-    }
-  };
-
+  const { getUserBalance, fetchQoute, userBalance, poolInfo } = useMeteora();
   return (
     <div className="h-screen flex items-center justify-center px-4 ">
       <div className="max-w-screen-xl w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -41,7 +18,9 @@ function Page() {
           <h2 className="text-xl font-saira text-yellow mb-4">
             Total Value Locked
           </h2>
-          <p className="text-4xl font-saira text-yellow mb-2">$20,944,903.00</p>
+          <p className="text-4xl font-saira text-yellow mb-2">
+            {poolInfo?.totalLockedLp.toNumber()}
+          </p>
           <p className="text-sm font-saira text-yellow mb-6">
             <span className="inline-block px-2 py-1 rounded">
               99.83% permanently locked
@@ -219,7 +198,7 @@ function Page() {
               Your Deposit
             </h2>
             <p className="text-2xl font-bold mb-4">$0.00</p>
-            <p className="text-sm text-gray-400">0.00 METAV-SOL</p>
+            <p className="text-sm text-gray-400">{userBalance} METAV-SOL</p>
           </div>
 
           {/* Deposit Card */}

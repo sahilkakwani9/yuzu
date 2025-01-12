@@ -1,11 +1,21 @@
-import AmmImpl, { MAINNET_POOL } from "@mercurial-finance/dynamic-amm-sdk";
+import AmmImpl, {
+  MAINNET_POOL,
+  PoolState,
+} from "@mercurial-finance/dynamic-amm-sdk";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import BN from "bn.js";
+import { useEffect, useState } from "react";
 
 const useMeteora = () => {
   const { publicKey } = useWallet();
   const { connection } = useConnection();
+  const [userBalance, setUserBalance] = useState(0);
+  const [poolInfo, setPoolInfo] = useState<PoolState>();
+  useEffect(() => {
+    getUserBalance();
+    getPoolInfo();
+  }, [publicKey]);
 
   const getPollInstance = async () => {
     try {
@@ -15,17 +25,32 @@ const useMeteora = () => {
     }
   };
 
+  const getPoolInfo = async () => {
+    try {
+      const constantProductPool = await getPollInstance();
+      const poolState = await constantProductPool?.poolState;
+      setPoolInfo(poolState);
+      return poolState;
+    } catch (error) {
+      console.log("error fetching pool info", error);
+    }
+  };
+
   const getUserBalance = async () => {
     try {
       if (!publicKey) {
         console.log("no public key found");
         return;
       }
+      console.log("fetching user balance");
+
       const constantProductPool = await getPollInstance();
       const userLpBalance = await constantProductPool!.getUserBalance(
         publicKey
       );
       console.log(userLpBalance.toNumber() / LAMPORTS_PER_SOL, "balance");
+
+      setUserBalance(userLpBalance.toNumber() / LAMPORTS_PER_SOL);
       return userLpBalance.toNumber() / LAMPORTS_PER_SOL;
     } catch (error) {
       console.log("Error depositing to pool:", error);
@@ -81,5 +106,9 @@ const useMeteora = () => {
     getUserBalance,
     createDepositTransaction,
     fetchQoute,
+    userBalance,
+    poolInfo,
   };
 };
+
+export default useMeteora;
