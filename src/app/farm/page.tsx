@@ -18,13 +18,17 @@ function Page() {
     userBalance,
     poolInfo,
     createDepositTransaction,
+    fetchWithdrawQoute,
+    createWithdrawTransaction,
   } = useMeteora();
   const { sendTransaction } = useWallet();
 
   const [usdcAmount, setUsdcAmount] = useState("");
   const [solAmount, setSolAmount] = useState("");
+  const [lpAmount, setLPAmount] = useState("");
   const [isUpdatingQuote, setIsUpdatingQuote] = useState(false);
   const [isDepositing, setIsDepositing] = useState(false);
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [lastUpdateTime, setLastUpdateTime] = useState(Date.now());
 
   const [currentQuote, setCurrentQuote] = useState<{
@@ -33,6 +37,11 @@ function Page() {
     tokenBInAmount: any;
   } | null>(null);
 
+  const [currentWithdrawQoute, setCurrentWIthdrawQoute] = useState<{
+    poolTokenAmountIn: any;
+    tokenAOutAmount: any;
+    tokenBOutAmount: any;
+  } | null>(null);
   const updateQuotes = async () => {
     if (!usdcAmount && !solAmount) return;
 
@@ -84,12 +93,10 @@ function Page() {
         const quote = await fetchQoute(usdcBN, false);
         if (quote) {
           setCurrentQuote(quote);
-          const solValue = quote.tokenBInAmount.toNumber() / LAMPORTS_PER_SOL;
-          setSolAmount(solValue.toString());
           setLastUpdateTime(Date.now());
         }
       } catch (error) {
-        console.error("Error fetching USDC quote:", error);
+        console.error("Error fetching LP quote:", error);
       } finally {
         setIsUpdatingQuote(false);
       }
@@ -120,7 +127,28 @@ function Page() {
     }, 500),
     [fetchQoute]
   );
+  const debouncedFetchLPQuote = useCallback(
+    debounce(async (amount: string) => {
+      if (!amount || isNaN(Number(amount))) return;
 
+      setIsUpdatingQuote(true);
+      const lpBN = new BN(Number(amount) * LAMPORTS_PER_SOL);
+
+      try {
+        const quote = await fetchWithdrawQoute(lpBN);
+        console.log("qoute", quote);
+
+        if (quote) {
+          setCurrentWIthdrawQoute(quote);
+        }
+      } catch (error) {
+        console.error("Error fetching SOL quote:", error);
+      } finally {
+        setIsUpdatingQuote(false);
+      }
+    }, 500),
+    [fetchQoute]
+  );
   const handleDeposit = async () => {
     if (!currentQuote || isUpdatingQuote || isDepositing) return;
 
@@ -171,6 +199,51 @@ function Page() {
     }
   };
 
+  const handleWithdraw = async () => {
+    if (!currentWithdrawQoute || isUpdatingQuote || isWithdrawing) return;
+
+    setIsWithdrawing(true);
+    try {
+      if (!currentWithdrawQoute) {
+        throw new Error("No quote available");
+      }
+
+      const transaction = await createWithdrawTransaction(
+        currentWithdrawQoute.poolTokenAmountIn,
+        currentWithdrawQoute.tokenAOutAmount,
+        currentWithdrawQoute.tokenBOutAmount
+      );
+
+      if (!transaction) {
+        throw new Error("Failed to create transaction");
+      }
+
+      // Send the transaction
+      const signature = await sendTransaction(transaction, mainnetConnection);
+
+      // Wait for confirmation
+      const confirmation = await mainnetConnection.confirmTransaction(
+        signature,
+        "confirmed"
+      );
+
+      if (confirmation.value.err) {
+        throw new Error("Transaction failed");
+      }
+
+      setLPAmount("");
+      setCurrentWIthdrawQoute(null);
+
+      // Refresh user balance
+      await getUserBalance();
+    } catch (error) {
+      console.error("Error during deposit:", error);
+      // You might want to show an error notification here
+    } finally {
+      setIsWithdrawing(false);
+    }
+  };
+
   const handleUsdcChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setUsdcAmount(value);
@@ -190,6 +263,22 @@ function Page() {
     } else {
       setUsdcAmount("");
       setCurrentQuote(null);
+    }
+  };
+
+  const handleLPChange = (e: React.ChangeEvent<HTMLInputElement> | string) => {
+    let value: string;
+
+    if (typeof e === "string") {
+      value = e;
+    } else {
+      value = e.target.value;
+    }
+
+    setLPAmount(value);
+
+    if (value) {
+      debouncedFetchLPQuote(value);
     }
   };
 
@@ -505,27 +594,86 @@ function Page() {
             ) : (
               <div className="space-y-4 text-yellow">
                 <div>
-                  <label htmlFor="withdrawUSDC" className="block text-sm mb-2">
-                    USDC
-                  </label>
-                  <input
-                    type="number"
-                    id="withdrawUSDC"
-                    className="w-full px-4 py-2 rounded bg-transparent border border-yellow text-yellow"
-                  />
-                </div>
-                <div>
                   <label htmlFor="withdrawSol" className="block text-sm mb-2">
-                    SOL
+                    USDC - SOL
                   </label>
                   <input
                     type="number"
-                    id="withdrawSol"
+                    id="withdraw USDC - SOL"
+                    placeholder="withdraw USDC - SOL"
                     className="w-full px-4 py-2 rounded bg-transparent  border border-yellow text-yellow"
+                    value={lpAmount}
+                    onChange={handleLPChange}
                   />
                 </div>
-                <button className="mt-4 px-4 md:px-6 py-1.5 md:py-2 rounded-xl w-full bg-[#F9E92B] text-black border-[3px] border-black font-saira font-semibold text-base md:text-xl">
-                  Withdraw
+                <div className="flex items-center justify-between p-2 bg-[#ffffff10] rounded-lg">
+                  <span className="text-sm">
+                    Balance: {userBalance || "0.00000000"}
+                  </span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        if (userBalance) {
+                          const halfBalance = (userBalance / 2).toFixed(8);
+                          handleLPChange(halfBalance);
+                        }
+                      }}
+                      className="px-3 py-1 text-xs bg-[#ffffff20] hover:bg-[#ffffff30] rounded transition-colors"
+                    >
+                      HALF
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (userBalance) {
+                          handleLPChange(userBalance.toString());
+                        }
+                      }}
+                      className="px-3 py-1 text-xs bg-[#ffffff20] hover:bg-[#ffffff30] rounded transition-colors"
+                    >
+                      MAX
+                    </button>
+                  </div>
+                </div>
+
+                {currentWithdrawQoute && (
+                  <div className="p-4 bg-white bg-opacity-10 rounded-md mb-4">
+                    <h3 className="text-yellow font-bold mb-2">
+                      Withdraw Quote
+                    </h3>
+                    <p className="text-yellow text-sm">
+                      <span className="font-semibold">USDC Out:</span>{" "}
+                      {currentWithdrawQoute.tokenAOutAmount.toNumber() /
+                        1000000}{" "}
+                      USDC
+                    </p>
+                    <p className="text-yellow text-sm">
+                      <span className="font-semibold">SOL Out:</span>{" "}
+                      {currentWithdrawQoute.tokenBOutAmount.toNumber() /
+                        LAMPORTS_PER_SOL}{" "}
+                      SOL
+                    </p>
+                  </div>
+                )}
+                <button
+                  className="mt-4 px-4 md:px-6 py-1.5 md:py-2 rounded-xl w-full bg-[#F9E92B] text-black border-[3px] border-black font-saira font-semibold text-base md:text-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={
+                    isUpdatingQuote || isWithdrawing || !currentWithdrawQoute
+                  }
+                  onClick={handleWithdraw}
+                >
+                  {isWithdrawing ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <span>Withdrawing...</span>
+                    </div>
+                  ) : isUpdatingQuote ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <span>Updating Quote...</span>
+                    </div>
+                  ) : (
+                    "Withdraw"
+                  )}
                 </button>
               </div>
             )}
