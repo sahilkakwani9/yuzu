@@ -33,7 +33,7 @@ function Navbar() {
             width={30}
           />
         </a>
-        <a href="https://x.com/yuzudotgame"> 
+        <a href="https://x.com/yuzudotai">
           <Image
             src={"/assets/X.svg"}
             alt="yuzu-logo"
