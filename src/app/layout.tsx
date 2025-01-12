@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Saira } from "next/font/google";
 
 import "./globals.css";
 import Navbar from "./components/Navbar";
+import AppWalletProvider from "@/lib/wallet/WalletProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,16 +40,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${saira.variable} antialiased relative`}
       >
-        <img
-          src="/bg-mobile.png"
-          className="absolute inset-0 w-screen h-full object-cover -z-10 md:hidden"
-        />
-        <img
-          src="/gradient.webp"
-          className="absolute left-0 -z-10 hidden md:block w-screen h-full object-fill"
-        />
-        <Navbar />
-        {children}
+        <AppWalletProvider>
+          <img
+            src="/bg-mobile.png"
+            className="absolute inset-0 w-screen h-full object-cover -z-10 md:hidden"
+          />
+          <img
+            src="/gradient.webp"
+            className="absolute left-0 -z-10 hidden md:block w-screen h-full object-fill"
+          />
+          <Navbar />
+          {children}
+        </AppWalletProvider>
       </body>
     </html>
   );

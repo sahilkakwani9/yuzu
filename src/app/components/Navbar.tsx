@@ -1,3 +1,5 @@
+"use client";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import Image from "next/image";
 import React from "react";
 
@@ -33,7 +35,7 @@ function Navbar() {
             width={30}
           />
         </a>
-        <a href="https://x.com/yuzudotgame"> 
+        <a href="https://x.com/yuzudotgame">
           <Image
             src={"/assets/X.svg"}
             alt="yuzu-logo"
@@ -42,6 +44,7 @@ function Navbar() {
             width={30}
           />
         </a>
+        <WalletMultiButton style={{}} />
       </div>
     </div>
   );
