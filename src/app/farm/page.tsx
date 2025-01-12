@@ -1,15 +1,203 @@
 "use client";
-import React, { useState } from "react";
-import { Connection, Keypair } from "@solana/web3.js";
+import React, { useCallback, useEffect, useState } from "react";
+import { Connection, Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import useMeteora from "@/lib/hooks/meteora";
+import { BN } from "bn.js";
+import { debounce } from "lodash";
+import { Loader2 } from "lucide-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 function Page() {
   const [isDeposit, setIsDeposit] = useState(true);
   const mainnetConnection = new Connection(
     "https://api.mainnet-beta.solana.com"
   );
+  const {
+    getUserBalance,
+    fetchQoute,
+    userBalance,
+    poolInfo,
+    createDepositTransaction,
+  } = useMeteora();
+  const { sendTransaction } = useWallet();
 
-  const { getUserBalance, fetchQoute, userBalance, poolInfo } = useMeteora();
+  const [usdcAmount, setUsdcAmount] = useState("");
+  const [solAmount, setSolAmount] = useState("");
+  const [isUpdatingQuote, setIsUpdatingQuote] = useState(false);
+  const [isDepositing, setIsDepositing] = useState(false);
+  const [lastUpdateTime, setLastUpdateTime] = useState(Date.now());
+
+  const [currentQuote, setCurrentQuote] = useState<{
+    poolTokenAmountOut: any;
+    tokenAInAmount: any;
+    tokenBInAmount: any;
+  } | null>(null);
+
+  const updateQuotes = async () => {
+    if (!usdcAmount && !solAmount) return;
+
+    setIsUpdatingQuote(true);
+    try {
+      if (usdcAmount) {
+        const usdcBN = new BN(Number(usdcAmount) * 1000000);
+        const quote = await fetchQoute(usdcBN, false);
+        if (quote) {
+          setCurrentQuote(quote);
+          const solValue = quote.tokenBInAmount.toNumber() / LAMPORTS_PER_SOL;
+          setSolAmount(solValue.toString());
+        }
+      } else if (solAmount) {
+        const solBN = new BN(Number(solAmount) * LAMPORTS_PER_SOL);
+        const quote = await fetchQoute(solBN, true);
+        if (quote) {
+          setCurrentQuote(quote);
+          const usdcValue = quote.tokenAInAmount.toNumber() / 1000000;
+          setUsdcAmount(usdcValue.toString());
+        }
+      }
+      setLastUpdateTime(Date.now());
+    } catch (error) {
+      console.error("Error updating quotes:", error);
+    } finally {
+      setIsUpdatingQuote(false);
+    }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (usdcAmount || solAmount) {
+        updateQuotes();
+      }
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [usdcAmount, solAmount]);
+
+  const debouncedFetchUSDCQuote = useCallback(
+    debounce(async (amount: string) => {
+      if (!amount || isNaN(Number(amount))) return;
+
+      setIsUpdatingQuote(true);
+      const usdcBN = new BN(Number(amount) * 1000000);
+
+      try {
+        const quote = await fetchQoute(usdcBN, false);
+        if (quote) {
+          setCurrentQuote(quote);
+          const solValue = quote.tokenBInAmount.toNumber() / LAMPORTS_PER_SOL;
+          setSolAmount(solValue.toString());
+          setLastUpdateTime(Date.now());
+        }
+      } catch (error) {
+        console.error("Error fetching USDC quote:", error);
+      } finally {
+        setIsUpdatingQuote(false);
+      }
+    }, 500),
+    [fetchQoute]
+  );
+
+  const debouncedFetchSOLQuote = useCallback(
+    debounce(async (amount: string) => {
+      if (!amount || isNaN(Number(amount))) return;
+
+      setIsUpdatingQuote(true);
+      const solBN = new BN(Number(amount) * LAMPORTS_PER_SOL);
+
+      try {
+        const quote = await fetchQoute(solBN, true);
+        if (quote) {
+          setCurrentQuote(quote);
+          const usdcValue = quote.tokenAInAmount.toNumber() / 1000000;
+          setUsdcAmount(usdcValue.toString());
+          setLastUpdateTime(Date.now());
+        }
+      } catch (error) {
+        console.error("Error fetching SOL quote:", error);
+      } finally {
+        setIsUpdatingQuote(false);
+      }
+    }, 500),
+    [fetchQoute]
+  );
+
+  const handleDeposit = async () => {
+    if (!currentQuote || isUpdatingQuote || isDepositing) return;
+
+    setIsDepositing(true);
+    try {
+      // Get the latest quote before proceeding
+      await updateQuotes();
+
+      if (!currentQuote) {
+        throw new Error("No quote available");
+      }
+
+      const transaction = await createDepositTransaction(
+        currentQuote.tokenAInAmount,
+        currentQuote.tokenBInAmount,
+        currentQuote.poolTokenAmountOut
+      );
+
+      if (!transaction) {
+        throw new Error("Failed to create transaction");
+      }
+
+      // Send the transaction
+      const signature = await sendTransaction(transaction, mainnetConnection);
+
+      // Wait for confirmation
+      const confirmation = await mainnetConnection.confirmTransaction(
+        signature,
+        "confirmed"
+      );
+
+      if (confirmation.value.err) {
+        throw new Error("Transaction failed");
+      }
+
+      // Clear the form after successful deposit
+      setUsdcAmount("");
+      setSolAmount("");
+      setCurrentQuote(null);
+
+      // Refresh user balance
+      await getUserBalance();
+    } catch (error) {
+      console.error("Error during deposit:", error);
+      // You might want to show an error notification here
+    } finally {
+      setIsDepositing(false);
+    }
+  };
+
+  const handleUsdcChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setUsdcAmount(value);
+    if (value) {
+      debouncedFetchUSDCQuote(value);
+    } else {
+      setSolAmount("");
+      setCurrentQuote(null);
+    }
+  };
+
+  const handleSolChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSolAmount(value);
+    if (value) {
+      debouncedFetchSOLQuote(value);
+    } else {
+      setUsdcAmount("");
+      setCurrentQuote(null);
+    }
+  };
+
+  const getTimeSinceUpdate = () => {
+    const seconds = Math.floor((Date.now() - lastUpdateTime) / 1000);
+    return `Updated ${seconds}s ago`;
+  };
+
   return (
     <div className="h-screen  flex items-center justify-center px-4 ">
       <div className="max-w-screen-xl w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -34,7 +222,7 @@ function Page() {
             <h3 className="text-lg text-yellow mb-3">Liquidity Allocation</h3>
             <div className="flex justify-between text-yellow text-sm">
               <div>
-                <span>METAV</span>
+                <span>USDC</span>
               </div>
               <div>377,862,688.264296</div>
             </div>
@@ -54,7 +242,7 @@ function Page() {
               <div>
                 <span>Current Pool Price:</span>
               </div>
-              <div>1 METAV ≈ 0.031491 SOL</div>
+              <div>1 USDC ≈ 0.031491 SOL</div>
             </div>
 
             <div className="flex justify-between text-yellow text-md mb-1">
@@ -218,7 +406,7 @@ function Page() {
           <div className="bg-yellow bg-opacity-30 p-6 rounded-lg shadow-lg font-saira">
             <h2 className="text-xl text-yellow mb-2">Your Deposit</h2>
             <p className="text-2xl text-yellow font-bold">$0.00</p>
-            <p className="text-sm text-yellow">{userBalance} METAV-SOL</p>
+            <p className="text-sm text-yellow">{userBalance} USDC-SOL</p>
           </div>
 
           {/* Deposit Card */}
@@ -248,20 +436,23 @@ function Page() {
             {/* Conditional rendering based on the state */}
             {isDeposit ? (
               <div className="space-y-4">
-                <div>
+                <div className="relative">
                   <label
-                    htmlFor="metav"
+                    htmlFor="USDC"
                     className="block text-sm mb-2 text-yellow"
                   >
-                    METAV
+                    USDC
                   </label>
                   <input
                     type="number"
-                    id="metav"
+                    id="USDC"
+                    value={usdcAmount}
+                    onChange={handleUsdcChange}
                     className="w-full px-4 py-2 rounded bg-transparent border border-yellow text-yellow"
+                    placeholder="Enter USDC amount"
                   />
                 </div>
-                <div>
+                <div className="relative">
                   <label
                     htmlFor="sol"
                     className="block text-sm mb-2 text-yellow"
@@ -271,22 +462,55 @@ function Page() {
                   <input
                     type="number"
                     id="sol"
+                    value={solAmount}
+                    onChange={handleSolChange}
                     className="w-full px-4 py-2 rounded bg-transparent border border-yellow text-yellow"
+                    placeholder="Enter SOL amount"
                   />
                 </div>
-                <button className="mt-4 px-4 md:px-6 py-1.5 md:py-2 rounded-xl w-full bg-[#F9E92B] text-black border-[3px] border-black font-saira font-semibold text-base md:text-xl">
-                  Deposit
+
+                {/* Quote update indicator */}
+                <div className="flex items-center justify-between text-xs text-yellow">
+                  {isUpdatingQuote ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      <span>Updating quote...</span>
+                    </div>
+                  ) : (
+                    <span>
+                      {(usdcAmount || solAmount) && getTimeSinceUpdate()}
+                    </span>
+                  )}
+                </div>
+                <button
+                  className="mt-4 px-4 md:px-6 py-1.5 md:py-2 rounded-xl w-full bg-[#F9E92B] text-black border-[3px] border-black font-saira font-semibold text-base md:text-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isUpdatingQuote || isDepositing || !currentQuote}
+                  onClick={handleDeposit}
+                >
+                  {isDepositing ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <span>Depositing...</span>
+                    </div>
+                  ) : isUpdatingQuote ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <span>Updating Quote...</span>
+                    </div>
+                  ) : (
+                    "Deposit"
+                  )}
                 </button>
               </div>
             ) : (
               <div className="space-y-4 text-yellow">
                 <div>
-                  <label htmlFor="withdrawMetav" className="block text-sm mb-2">
-                    METAV
+                  <label htmlFor="withdrawUSDC" className="block text-sm mb-2">
+                    USDC
                   </label>
                   <input
                     type="number"
-                    id="withdrawMetav"
+                    id="withdrawUSDC"
                     className="w-full px-4 py-2 rounded bg-transparent border border-yellow text-yellow"
                   />
                 </div>
@@ -308,14 +532,6 @@ function Page() {
           </div>
         </div>
       </div>
-
-      {/* <h1 className="text-xl  font-bold mb-4">Test Deposit to Pool</h1>
-      <button
-        onClick={depositToPool}
-        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200"
-      >
-        Deposit to Pool
-      </button> */}
     </div>
   );
 }
