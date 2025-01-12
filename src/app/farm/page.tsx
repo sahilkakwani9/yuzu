@@ -93,6 +93,8 @@ function Page() {
         const quote = await fetchQoute(usdcBN, false);
         if (quote) {
           setCurrentQuote(quote);
+          const solValue = quote.tokenAInAmount.toNumber() / LAMPORTS_PER_SOL;
+          setSolAmount(solValue.toString());
           setLastUpdateTime(Date.now());
         }
       } catch (error) {
