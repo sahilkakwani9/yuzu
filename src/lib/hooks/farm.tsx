@@ -1,3 +1,4 @@
+"use client";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { PoolFarmImpl } from "@mercurial-finance/farming-sdk";
@@ -15,12 +16,12 @@ const useMeteoraFarm = () => {
 
   const getFarmPoolInstance = async () => {
     try {
-      const USDC_acUSDC_POOL = new PublicKey(
-        "6ZLKLjMd2KzH7PPHCXUPgbMAtdTT37VgTtdeXWLoJppr"
+      const BONK_SOL_POOL = new PublicKey(
+        "278P6iwdEeX5tUFMGxmi2tii3EAho4iHzfiroKLKCQKj"
       );
 
       const farmingPools = await PoolFarmImpl.getFarmAddressesByPoolAddress(
-        USDC_acUSDC_POOL
+        BONK_SOL_POOL
       );
       // farmingPools is an array (A pool can have multiple farms)
       const farmingPool = farmingPools[0];
@@ -84,3 +85,5 @@ const useMeteoraFarm = () => {
     unstake,
   };
 };
+
+export default useMeteoraFarm;

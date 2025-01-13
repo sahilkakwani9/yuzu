@@ -1,10 +1,18 @@
 "use client";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { BN } from "bn.js";
 import React, { useState } from "react";
 
 function Page() {
-  const [activeTab, setActiveTab] = useState("stake"); // State to track active tab
+  const [activeTab, setActiveTab] = useState("stake");
   const [stakeAmount, setStakeAmount] = useState("");
   const [unstakeAmount, setUnstakeAmount] = useState("");
+  // const [isDepositing, setIsDepositing] = useState(false);
+  // const [isWithdrawing, setIsWithdrawing] = useState(false);
+
+  // const { farmBalance, stake } = useMeteoraFarm();
+  // const { sendTransaction } = useWallet();
+  // const { connection } = useConnection();
 
   const handleStakeChange = (e) => {
     setStakeAmount(e.target.value);
@@ -14,9 +22,28 @@ function Page() {
     setUnstakeAmount(e.target.value);
   };
 
-  const handleDeposit = () => {
-    alert(`You have staked ${stakeAmount} Bonk-SOL tokens!`);
-    setStakeAmount("");
+  const handleDeposit = async () => {
+    // try {
+    //   setIsDepositing(true);
+    //   const stakeTx = await stake(new BN(stakeAmount));
+    //   if (!stakeTx) {
+    //     throw new Error("Failed to create transaction");
+    //   }
+    //   const signature = await sendTransaction(stakeTx, connection);
+    //   // Wait for confirmation
+    //   const confirmation = await connection.confirmTransaction(
+    //     signature,
+    //     "confirmed"
+    //   );
+    //   if (confirmation.value.err) {
+    //     throw new Error("Transaction failed");
+    //   }
+    //   setStakeAmount("0");
+    // } catch (error) {
+    //   console.log("error depositing tokens", error);
+    // } finally {
+    //   setIsDepositing(false);
+    // }
   };
 
   const handleWithdraw = () => {
@@ -103,7 +130,7 @@ function Page() {
                 <span className="px-4 py-2">Bonk-SOL</span>
               </div>
             </div>
-            <p className="text-sm mb-4">Balance: 0.002711576 Bonk-SOL</p>
+            {/* <p className="text-sm mb-4">{`Balance: ${farmBalance} Bonk-SOL`}</p> */}
             <button
               className={`w-full py-2 rounded-lg text-black border-[3px] border-black bg-yellow font-medium `}
               onClick={handleWithdraw}
