@@ -4,6 +4,7 @@ import AmmImpl, {
   PoolState,
 } from "@mercurial-finance/dynamic-amm-sdk";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { PublicKey } from "@solana/web3.js";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import BN from "bn.js";
 import { useEffect, useState } from "react";
@@ -21,7 +22,10 @@ const useMeteora = () => {
 
   const getPollInstance = async () => {
     try {
-      return await AmmImpl.create(connection, MAINNET_POOL.USDC_SOL);
+      return await AmmImpl.create(
+        connection,
+        new PublicKey("BnNUvR82pYVU472oLB8E3UdLrsgrpaz8D1sqisa7xN44")
+      );
     } catch (error) {
       console.log("error creating pool instance");
     }

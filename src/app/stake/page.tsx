@@ -1,6 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
-import { Connection, Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { Connection, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import useMeteora from "@/lib/hooks/meteora";
 import { BN } from "bn.js";
 import { debounce } from "lodash";
@@ -24,7 +24,7 @@ function Page() {
   } = useMeteora();
   const { sendTransaction } = useWallet();
 
-  const [usdcAmount, setUsdcAmount] = useState("");
+  const [YuzuAmount, setYuzuAmount] = useState("");
   const [solAmount, setSolAmount] = useState("");
   const [lpAmount, setLPAmount] = useState("");
   const [isUpdatingQuote, setIsUpdatingQuote] = useState(false);
@@ -43,14 +43,39 @@ function Page() {
     tokenAOutAmount: any;
     tokenBOutAmount: any;
   } | null>(null);
+
+  const [poolPrices, setPoolPrices] = useState({
+    solPerYuzu: 0,
+    yuzuPerSol: 0,
+  });
+
+  const calculatePoolPrices = useCallback(() => {
+    if (poolState) {
+      const yuzuAmount = poolState.tokenAAmount.toNumber() / 1000000; // Convert to YUZU (6 decimals)
+      const solAmount = poolState.tokenBAmount.toNumber() / LAMPORTS_PER_SOL; // Convert to SOL
+
+      const solPerYuzu = solAmount / yuzuAmount;
+      const yuzuPerSol = yuzuAmount / solAmount;
+
+      setPoolPrices({
+        solPerYuzu,
+        yuzuPerSol,
+      });
+    }
+  }, [poolState]);
+
+  useEffect(() => {
+    calculatePoolPrices();
+  }, [poolState, calculatePoolPrices]);
+
   const updateQuotes = async () => {
-    if (!usdcAmount && !solAmount) return;
+    if (!YuzuAmount && !solAmount) return;
 
     setIsUpdatingQuote(true);
     try {
-      if (usdcAmount) {
-        const usdcBN = new BN(Number(usdcAmount) * 1000000);
-        const quote = await fetchQoute(usdcBN, false);
+      if (YuzuAmount) {
+        const YuzuBN = new BN(Number(YuzuAmount) * 1000000);
+        const quote = await fetchQoute(YuzuBN, false);
         if (quote) {
           setCurrentQuote(quote);
           const solValue = quote.tokenBInAmount.toNumber() / LAMPORTS_PER_SOL;
@@ -61,8 +86,8 @@ function Page() {
         const quote = await fetchQoute(solBN, true);
         if (quote) {
           setCurrentQuote(quote);
-          const usdcValue = quote.tokenAInAmount.toNumber() / 1000000;
-          setUsdcAmount(usdcValue.toString());
+          const YuzuValue = quote.tokenAInAmount.toNumber() / 1000000;
+          setYuzuAmount(YuzuValue.toString());
         }
       }
       setLastUpdateTime(Date.now());
@@ -75,23 +100,23 @@ function Page() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (usdcAmount || solAmount) {
+      if (YuzuAmount || solAmount) {
         updateQuotes();
       }
     }, 10000);
 
     return () => clearInterval(interval);
-  }, [usdcAmount, solAmount]);
+  }, [YuzuAmount, solAmount]);
 
-  const debouncedFetchUSDCQuote = useCallback(
+  const debouncedFetchYuzuQuote = useCallback(
     debounce(async (amount: string) => {
       if (!amount || isNaN(Number(amount))) return;
 
       setIsUpdatingQuote(true);
-      const usdcBN = new BN(Number(amount) * 1000000);
+      const YuzuBN = new BN(Number(amount) * 1000000);
 
       try {
-        const quote = await fetchQoute(usdcBN, false);
+        const quote = await fetchQoute(YuzuBN, false);
         if (quote) {
           setCurrentQuote(quote);
           const solValue = quote.tokenAInAmount.toNumber() / LAMPORTS_PER_SOL;
@@ -118,8 +143,8 @@ function Page() {
         const quote = await fetchQoute(solBN, true);
         if (quote) {
           setCurrentQuote(quote);
-          const usdcValue = quote.tokenAInAmount.toNumber() / 1000000;
-          setUsdcAmount(usdcValue.toString());
+          const YuzuValue = quote.tokenAInAmount.toNumber() / 1000000;
+          setYuzuAmount(YuzuValue.toString());
           setLastUpdateTime(Date.now());
         }
       } catch (error) {
@@ -188,7 +213,7 @@ function Page() {
       }
 
       // Clear the form after successful deposit
-      setUsdcAmount("");
+      setYuzuAmount("");
       setSolAmount("");
       setCurrentQuote(null);
 
@@ -247,11 +272,11 @@ function Page() {
     }
   };
 
-  const handleUsdcChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleYuzuChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setUsdcAmount(value);
+    setYuzuAmount(value);
     if (value) {
-      debouncedFetchUSDCQuote(value);
+      debouncedFetchYuzuQuote(value);
     } else {
       setSolAmount("");
       setCurrentQuote(null);
@@ -264,7 +289,7 @@ function Page() {
     if (value) {
       debouncedFetchSOLQuote(value);
     } else {
-      setUsdcAmount("");
+      setYuzuAmount("");
       setCurrentQuote(null);
     }
   };
@@ -295,7 +320,7 @@ function Page() {
       <div className="max-w-screen-xl w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Total Value Locked Card */}
         <div className="bg-yellow bg-opacity-30 p-6 rounded-lg shadow-lg lg:col-span-2">
-          <h2 className="text-xl font-saira text-yellow mb-4">
+          {/* <h2 className="text-xl font-saira text-yellow mb-4">
             Total Value Locked
           </h2>
           <p className="text-4xl font-saira text-yellow mb-2">
@@ -305,7 +330,7 @@ function Page() {
             <span className="inline-block px-2 py-1 rounded">
               99.83% permanently locked
             </span>
-          </p>
+          </p> */}
 
           <hr className="border-yellow border-opacity-50 my-4" />
 
@@ -314,7 +339,7 @@ function Page() {
             <h3 className="text-lg text-yellow mb-3">Liquidity Allocation</h3>
             <div className="flex justify-between text-yellow text-sm">
               <div>
-                <span>USDC</span>
+                <span>Yuzu</span>
               </div>
               <div>{poolState?.tokenAAmount.toNumber() / 1000000}</div>
             </div>
@@ -336,7 +361,10 @@ function Page() {
               <div>
                 <span>Current Pool Price:</span>
               </div>
-              <div>1 USDC ≈ 0.031491 SOL</div>
+              <div className="flex flex-col items-end">
+                <div>1 YUZU ≈ {poolPrices.solPerYuzu.toFixed(6)} SOL</div>
+                <div>1 SOL ≈ {poolPrices.yuzuPerSol.toFixed(2)} YUZU</div>
+              </div>
             </div>
 
             <div className="flex justify-between text-yellow text-md mb-1">
@@ -354,7 +382,7 @@ function Page() {
           <div className="bg-yellow bg-opacity-30 p-6 rounded-lg shadow-lg font-saira">
             <h2 className="text-xl text-yellow mb-2">Your Deposit</h2>
             <p className="text-2xl text-yellow font-bold">$0.00</p>
-            <p className="text-sm text-yellow">{userBalance} USDC-SOL</p>
+            <p className="text-sm text-yellow">{userBalance} Yuzu-SOL</p>
           </div>
 
           {/* Deposit Card */}
@@ -386,18 +414,18 @@ function Page() {
               <div className="space-y-4">
                 <div className="relative">
                   <label
-                    htmlFor="USDC"
+                    htmlFor="Yuzu"
                     className="block text-sm mb-2 text-yellow"
                   >
-                    USDC
+                    Yuzu
                   </label>
                   <input
                     type="number"
-                    id="USDC"
-                    value={usdcAmount}
-                    onChange={handleUsdcChange}
+                    id="Yuzu"
+                    value={YuzuAmount}
+                    onChange={handleYuzuChange}
                     className="w-full px-4 py-2 rounded bg-transparent border border-yellow text-yellow"
-                    placeholder="Enter USDC amount"
+                    placeholder="Enter Yuzu amount"
                   />
                 </div>
                 <div className="relative">
@@ -426,7 +454,7 @@ function Page() {
                     </div>
                   ) : (
                     <span>
-                      {(usdcAmount || solAmount) && getTimeSinceUpdate()}
+                      {(YuzuAmount || solAmount) && getTimeSinceUpdate()}
                     </span>
                   )}
                 </div>
@@ -454,12 +482,12 @@ function Page() {
               <div className="space-y-4 text-yellow">
                 <div>
                   <label htmlFor="withdrawSol" className="block text-sm mb-2">
-                    USDC - SOL
+                    Yuzu - SOL
                   </label>
                   <input
                     type="number"
-                    id="withdraw USDC - SOL"
-                    placeholder="withdraw USDC - SOL"
+                    id="withdraw Yuzu - SOL"
+                    placeholder="withdraw Yuzu - SOL"
                     className="w-full px-4 py-2 rounded bg-transparent  border border-yellow text-yellow"
                     value={lpAmount}
                     onChange={handleLPChange}
@@ -500,10 +528,10 @@ function Page() {
                       Withdraw Quote
                     </h3>
                     <p className="text-yellow text-sm">
-                      <span className="font-semibold">USDC:</span>{" "}
+                      <span className="font-semibold">Yuzu:</span>{" "}
                       {currentWithdrawQoute.tokenAOutAmount.toNumber() /
                         1000000}{" "}
-                      USDC
+                      Yuzu
                     </p>
                     <p className="text-yellow text-sm">
                       <span className="font-semibold">SOL:</span>{" "}
