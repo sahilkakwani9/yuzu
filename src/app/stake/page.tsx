@@ -17,6 +17,7 @@ function Page() {
     fetchQoute,
     userBalance,
     poolInfo,
+    poolState,
     createDepositTransaction,
     fetchWithdrawQoute,
     createWithdrawTransaction,
@@ -315,13 +316,15 @@ function Page() {
               <div>
                 <span>USDC</span>
               </div>
-              <div>377,862,688.264296</div>
+              <div>{poolState?.tokenAAmount.toNumber() / 1000000}</div>
             </div>
             <div className="flex justify-between text-yellow text-sm mt-2">
               <div>
                 <span>SOL</span>
               </div>
-              <div>56,416.984574588</div>
+              <div>
+                {poolState?.tokenBAmount.toNumber()! / LAMPORTS_PER_SOL}
+              </div>
             </div>
           </div>
 
@@ -340,37 +343,7 @@ function Page() {
               <div>
                 <span>Virtual Price:</span>
               </div>
-              <div>1.17759461</div>
-            </div>
-            <div className="flex justify-between text-yellow text-md mb-1">
-              <div>
-                <span>24h Volume:</span>
-              </div>
-              <div>$1,125,716.25</div>
-            </div>
-            <div className="flex justify-between text-yellow text-sm mb-1">
-              <div>
-                <span>24h Yield:</span>
-              </div>
-              <div>$1,292.97</div>
-            </div>
-            <div className="flex justify-between text-yellow text-md mb-1">
-              <div>
-                <span>24h Fee:</span>
-              </div>
-              <div>$22,514.32</div>
-            </div>
-            <div className="flex justify-between text-yellow text-md mb-1">
-              <div>
-                <span>Liquidity Provider Fee:</span>
-              </div>
-              <div>2%</div>
-            </div>
-            <div className="flex justify-between text-yellow text-md mb-1">
-              <div>
-                <span>Protocol Fee:</span>
-              </div>
-              <div>0.4%</div>
+              <div>{poolState?.virtualPrice}</div>
             </div>
           </div>
         </div>

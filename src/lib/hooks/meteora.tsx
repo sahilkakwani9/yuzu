@@ -1,5 +1,6 @@
 import AmmImpl, {
   MAINNET_POOL,
+  PoolInformation,
   PoolState,
 } from "@mercurial-finance/dynamic-amm-sdk";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
@@ -12,6 +13,7 @@ const useMeteora = () => {
   const { connection } = useConnection();
   const [userBalance, setUserBalance] = useState(0);
   const [poolInfo, setPoolInfo] = useState<PoolState>();
+  const [poolState, setPoolState] = useState<PoolInformation>();
   useEffect(() => {
     getUserBalance();
     getPoolInfo();
@@ -29,7 +31,9 @@ const useMeteora = () => {
     try {
       const constantProductPool = await getPollInstance();
       const poolState = await constantProductPool?.poolState;
+      const poolInfo = await constantProductPool?.poolInfo;
       setPoolInfo(poolState);
+      setPoolState(poolInfo);
       return poolState;
     } catch (error) {
       console.log("error fetching pool info", error);
@@ -148,10 +152,11 @@ const useMeteora = () => {
     getUserBalance,
     createDepositTransaction,
     fetchQoute,
-    userBalance,
-    poolInfo,
     createWithdrawTransaction,
     fetchWithdrawQoute,
+    userBalance,
+    poolInfo,
+    poolState,
   };
 };
 
